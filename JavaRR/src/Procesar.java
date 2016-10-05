@@ -13,6 +13,7 @@ import static java.lang.Integer.parseInt;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.DefaultTable­Model;
+import javax.swing.JOptionPane;
 
 public class Procesar extends javax.swing.JFrame {
     
@@ -22,6 +23,8 @@ public class Procesar extends javax.swing.JFrame {
     int NProceso;//Carga el número de procesos ejecutándose
     int Rafaga=0;//Carga la ráfaga en ejecución
     int rafagaRestante=0;//Carga el residuo en ejecución
+    int tProceso = 0;
+    int progreso=0;
     /**
      * Creates new form Procesar
      */
@@ -73,12 +76,13 @@ public class Procesar extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Menlo", 0, 24)); // NOI18N
         jLabel1.setText("Simulador de Procesos Round Robin");
 
+        jTable1.setFont(new java.awt.Font("Menlo", 0, 12)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Nombre", "Ráfaga", "Ráfaga restante", "Progreso", "Estado"
+                "No. de Proceso", "Ráfaga", "Ráfaga restante", "Progreso", "Estado"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -86,7 +90,7 @@ public class Procesar extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Menlo", 0, 14)); // NOI18N
         jLabel2.setText("Ráfaga");
 
-        jLabel3.setFont(new java.awt.Font("Lucida Grande", 0, 24)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Menlo", 0, 24)); // NOI18N
         jLabel3.setText("Procesos");
 
         jLabel4.setFont(new java.awt.Font("Menlo", 0, 14)); // NOI18N
@@ -99,10 +103,6 @@ public class Procesar extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(269, 269, 269)
-                .addComponent(jLabel3)
-                .addContainerGap(285, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1)
@@ -110,7 +110,7 @@ public class Procesar extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGap(0, 24, Short.MAX_VALUE)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 613, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -132,6 +132,10 @@ public class Procesar extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(jButton2)))
                 .addGap(19, 19, 19))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(253, 253, 253)
+                .addComponent(jLabel3)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -151,11 +155,11 @@ public class Procesar extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel5))))
-                .addGap(53, 53, 53)
+                .addGap(47, 47, 47)
                 .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(37, Short.MAX_VALUE))
+                .addContainerGap(38, Short.MAX_VALUE))
         );
 
         pack();
@@ -178,6 +182,7 @@ public class Procesar extends javax.swing.JFrame {
                 new Procesar().setVisible(true);
             }
         });
+        
     }
     
     public void Insertar(){     //Función que inserta procesos en la tabla jTable1.
@@ -187,7 +192,7 @@ public class Procesar extends javax.swing.JFrame {
         tabla[0]= contar;            //Llenamos la tabla.
         tabla[1]= jTextField1.getText();        //Llenamos la tabla.
         tabla[2]= jTextField1.getText();        //Llenamos la tabla.
-        tabla[3]= jTextField1.getText(); //Llenamos la tabla.
+        tabla[3]= tProceso; //Llenamos la tabla.
         tabla[4]= "Listo";                      //Llenamos la tabla.
         data.addRow(tabla);     //Asignamos el objeto tabla a la fila de la tabla "data".
         jTable1.setModel(data); //Asignamos la tabla "data" a la tabla jTable1.
@@ -207,8 +212,12 @@ public class Procesar extends javax.swing.JFrame {
                         for(int ejecucion=1; ejecucion<=quantum; ejecucion++){
                             jTable1.setValueAt("Ejecutando",conta,4);   //Actualización del estado del proceso a Ejecutando
                             rafagaRestante--;    //Reduciendo la ráfaga en 1
+                            
                             jTable1.setValueAt(String.valueOf(rafagaRestante),conta,2);
                             Esperar();  //Función que ralentiza la ejecución para que espere 1 segundo
+                            tProceso++;
+                            //ActualizarProceso(Rafaga,tProceso);
+                            //jTable1.setValueAt(String.valueOf(progreso),conta,3);
                         }
                         jTable1.setValueAt("Bloqueado",conta,4);
                         if(rafagaRestante==0){
@@ -223,6 +232,9 @@ public class Procesar extends javax.swing.JFrame {
                                 rafagaRestante--;
                                 jTable1.setValueAt(String.valueOf(rafagaRestante),conta,2);
                                 Esperar();  //Función que ralentiza la ejecución para que espere 1 segundo
+                                tProceso++;
+                                //ActualizarProceso(Rafaga,tProceso);
+                                //jTable1.setValueAt(String.valueOf(progreso),conta,3);
                             }
                             jTable1.setValueAt("Bloqueado",conta,4);
                             if(rafagaRestante==0){
@@ -251,21 +263,26 @@ public class Procesar extends javax.swing.JFrame {
     }
     
     public void Limpiar(int c){ //Cambia el estado de los procesos cuando estos terminan de ejecutarse por completo.
-    jTable1.setValueAt(0,c,0);
     jTable1.setValueAt("0",c,1);
     jTable1.setValueAt("0",c,2);
-    jTable1.setValueAt("0",c,3);
+    jTable1.setValueAt("100%",c,3);
     jTable1.setValueAt("Terminado",c,4);
     }
     
+    //public void ActualizarProceso(int rafaga, int tProceso){ //Calcula porcentaje de la barra y su progreso
+    //    int Progreso;
+    //    Progreso = tProceso*100/rafaga;
+    //    progreso = Progreso;
+    //}
+    
     public void Esperar(){
-    try{
-        Thread.sleep(1000); //Permite esperar 1 segundo al sistema
-    }catch(InterruptedException ex){
-        Logger.getLogger(Procesar.class.getName()).log(Level.SEVERE,null,ex);
-    }
-
-}   
+        try{
+            Thread.sleep(1000); //Permite esperar 1 segundo al sistema
+        }
+        catch(InterruptedException ex){
+            Logger.getLogger(Procesar.class.getName()).log(Level.SEVERE,null,ex);
+        }
+    }   
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
