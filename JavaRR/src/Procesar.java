@@ -8,11 +8,10 @@
  *
  * @author hectorleon
  */
-import java.awt.Color;
+//Librerias utilizadas
 import static java.lang.Integer.parseInt;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTable­Model;
 
 public class Procesar extends javax.swing.JFrame {
@@ -20,19 +19,15 @@ public class Procesar extends javax.swing.JFrame {
     //Variables
     int contar=0;
     int quantum=5;
-    //Variables
     int NProceso;//Carga el número de procesos ejecutándose
     int Rafaga=0;//Carga la ráfaga en ejecución
-    int ResiduoRafaga=0;//Carga el residuo en ejecución
-    int TiempoProceso=0;//Carga el tiempo que se dura procesando
-    int ValorBarra;//Carga el progreso de la Barra
-    int CantidadProcesos;//Número de procesos terminados
+    int rafagaRestante=0;//Carga el residuo en ejecución
     /**
      * Creates new form Procesar
      */
     public Procesar() {
         initComponents();           //Inicia los componentes
-        jTextField1.grabFocus();    //Enfoca al usuario a l campode texto para que introduzca la ráfaga
+        jTextField1.grabFocus();    //Enfoca al usuario al campo de texto para que introduzca la ráfaga
     }
 
     /**
@@ -171,37 +166,13 @@ public class Procesar extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        new Thread(new HiloNuevo()).start();        //Creación d eun hilo para ejecución 
+        new Thread(new HiloNuevo()).start();        //Creación de un hilo para ejecución 
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Procesar.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Procesar.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Procesar.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Procesar.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Procesar().setVisible(true);
@@ -213,10 +184,10 @@ public class Procesar extends javax.swing.JFrame {
         DefaultTableModel data = (DefaultTableModel) jTable1.getModel();
         contar++; //Aumenta el contador a medida que se agregan procesos.
         Object[] tabla = new Object [5]; //El objeto tabla representa el numero de las columna.
-        tabla[0]= "Proceso "+contar;            //Llenamos la tabla.
+        tabla[0]= contar;            //Llenamos la tabla.
         tabla[1]= jTextField1.getText();        //Llenamos la tabla.
         tabla[2]= jTextField1.getText();        //Llenamos la tabla.
-        tabla[3]= "-"; //jTextField1.getText(); //Llenamos la tabla.
+        tabla[3]= jTextField1.getText(); //Llenamos la tabla.
         tabla[4]= "Listo";                      //Llenamos la tabla.
         data.addRow(tabla);     //Asignamos el objeto tabla a la fila de la tabla "data".
         jTable1.setModel(data); //Asignamos la tabla "data" a la tabla jTable1.
@@ -230,74 +201,71 @@ public class Procesar extends javax.swing.JFrame {
             boolean estado =true;   //Variable auxiliar par ala condición
             int conta=0;        //Variable contador 
             while(estado!=false){
-            while(conta<contar){ //Recorrer las filas
-                Carga(conta);
-                if(ResiduoRafaga!=0 && ResiduoRafaga>quantum){ 
-                    for(int ejecucion=1; ejecucion<=quantum; ejecucion++){
-                        jTable1.setValueAt("Ejecutando",conta,4);
-                        ResiduoRafaga--;
-                        Barra(Rafaga,ResiduoRafaga);
-                        Pintar();
-                        jTable1.setValueAt(String.valueOf(ResiduoRafaga),i,3);
-                        TiempoProceso++;
-                        Dormir();
-                    }
-                    jTable1.setValueAt("Bloqueado",conta,4);
-                    if(ResiduoRafaga==0){
-                        jTable1.setValueAt("Terminado",conta,4);
-                        Pintar();
-                        Informe(conta);
-                        Borrar(conta);
-                        jPBEstado.setValue(0);
-                    }
-            }else{
-                if(ResiduoRafaga>0 && quantum!=0){
-                    while(ResiduoRafaga>0){
-                        jTable1.setValueAt("Ejecutando",conta,4);
-                        ResiduoRafaga--;
-                        Barra(Rafaga,ResiduoRafaga);
-                        Pintar();
-                        jTable1.setValueAt(String.valueOf(ResiduoRafaga),i,3);
-                        TiempoProceso++;
-                        Dormir();
-                    }
-                    jTable1.setValueAt("Bloqueado",conta,4);
-                    if(ResiduoRafaga==0 && quantum!=0){
-                        jTIngreso.setValueAt("Terminado",conta,4);
-                        Pintar();
-                        Informe(conta);
-                        Borrar(conta);
-                        jPBEstado.setValue(0);
-                     }
-                    }else{
-                        if(ResiduoRafaga==0 && quantum!=0){
-                            jTIngreso.setValueAt("Terminado",conta,4);
-                            Pintar();
-                            Informe(conta);
-                            Borrar(conta);
-                            jPBEstado.setValue(0);
+                while(conta<contar){ //Recorreriendo las filas
+                    Carga(conta);
+                    if(rafagaRestante!=0 && rafagaRestante>quantum){ 
+                        for(int ejecucion=1; ejecucion<=quantum; ejecucion++){
+                            jTable1.setValueAt("Ejecutando",conta,4);   //Actualización del estado del proceso a Ejecutando
+                            rafagaRestante--;    //Reduciendo la ráfaga en 1
+                            jTable1.setValueAt(String.valueOf(rafagaRestante),conta,2);
+                            Esperar();  //Función que ralentiza la ejecución para que espere 1 segundo
+                        }
+                        jTable1.setValueAt("Bloqueado",conta,4);
+                        if(rafagaRestante==0){
+                            jTable1.setValueAt("Terminado",conta,4);
+                            Limpiar(conta);
                         }
                     }
+                    else{
+                        if(rafagaRestante>0){
+                            while(rafagaRestante>0){     //Mientras exista un residuo de ráfaga CONDICIÓN
+                                jTable1.setValueAt("Ejecutando",conta,4);
+                                rafagaRestante--;
+                                jTable1.setValueAt(String.valueOf(rafagaRestante),conta,2);
+                                Esperar();  //Función que ralentiza la ejecución para que espere 1 segundo
+                            }
+                            jTable1.setValueAt("Bloqueado",conta,4);
+                            if(rafagaRestante==0){
+                                jTable1.setValueAt("Terminado",conta,4);
+                                Limpiar(conta);
+                            }
+                        }
+                        else{
+                            if(rafagaRestante==0){
+                                jTable1.setValueAt("Terminado",conta,4);
+                                Limpiar(conta);
+                            }
+                        }
+                    }
+                    conta++;
                 }
-                jLNumeroProceso.setText(String.valueOf("")); //Borrar contenido
-                jLPorcentajeProceso.setText(String.valueOf(""));
-                conta++;
+                conta=0;  
             }
-            conta=0;
-            jLNumeroProceso.setText(String.valueOf("")); //Borrar contenido
-            jLPorcentajeProceso.setText(String.valueOf(""));
-            
-        }
-        }
-        
+        }    
     }
 
     public void Carga(int conta){ //Carga los valores de la Tabla a ejecución
         NProceso=(int)jTable1.getValueAt(conta,0);
         Rafaga=parseInt((String)(jTable1.getValueAt(conta,1)));
-        ResiduoRafaga=parseInt((String)(jTable1.getValueAt(conta,3)));
+        rafagaRestante=parseInt((String)(jTable1.getValueAt(conta,2)));
     }
     
+    public void Limpiar(int c){ //Cambia el estado de los procesos cuando estos terminan de ejecutarse por completo.
+    jTable1.setValueAt(0,c,0);
+    jTable1.setValueAt("0",c,1);
+    jTable1.setValueAt("0",c,2);
+    jTable1.setValueAt("0",c,3);
+    jTable1.setValueAt("Terminado",c,4);
+    }
+    
+    public void Esperar(){
+    try{
+        Thread.sleep(1000); //Permite esperar 1 segundo al sistema
+    }catch(InterruptedException ex){
+        Logger.getLogger(Procesar.class.getName()).log(Level.SEVERE,null,ex);
+    }
+
+}   
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
