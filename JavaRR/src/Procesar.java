@@ -8,13 +8,31 @@
  *
  * @author hectorleon
  */
-public class Procesar extends javax.swing.JFrame {
+import java.awt.Color;
+import static java.lang.Integer.parseInt;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTable­Model;
 
+public class Procesar extends javax.swing.JFrame {
+    
+    //Variables
+    int contar=0;
+    int quantum=5;
+    //Variables
+    int NProceso;//Carga el número de procesos ejecutándose
+    int Rafaga=0;//Carga la ráfaga en ejecución
+    int ResiduoRafaga=0;//Carga el residuo en ejecución
+    int TiempoProceso=0;//Carga el tiempo que se dura procesando
+    int ValorBarra;//Carga el progreso de la Barra
+    int CantidadProcesos;//Número de procesos terminados
     /**
      * Creates new form Procesar
      */
     public Procesar() {
-        initComponents();
+        initComponents();           //Inicia los componentes
+        jTextField1.grabFocus();    //Enfoca al usuario a l campode texto para que introduzca la ráfaga
     }
 
     /**
@@ -42,10 +60,20 @@ public class Procesar extends javax.swing.JFrame {
         jButton1.setFont(new java.awt.Font("Menlo", 0, 13)); // NOI18N
         jButton1.setText("Insertar");
         jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setBackground(new java.awt.Color(0, 153, 153));
         jButton2.setFont(new java.awt.Font("Menlo", 0, 13)); // NOI18N
         jButton2.setText("Comenzar");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Menlo", 0, 24)); // NOI18N
         jLabel1.setText("Simulador de Procesos Round Robin");
@@ -79,7 +107,7 @@ public class Procesar extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(269, 269, 269)
                 .addComponent(jLabel3)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(285, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1)
@@ -87,8 +115,8 @@ public class Procesar extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 19, Short.MAX_VALUE)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 627, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 613, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -97,15 +125,14 @@ public class Procesar extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(74, 74, 74)
                                 .addComponent(jLabel5)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(98, 98, 98))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(108, 108, 108)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addGap(153, 153, 153)))
                         .addComponent(jButton1)
                         .addGap(18, 18, 18)
                         .addComponent(jButton2)))
@@ -138,6 +165,14 @@ public class Procesar extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        Insertar();  //Función que inserta los elementos a la tabla
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        new Thread(new HiloNuevo()).start();        //Creación d eun hilo para ejecución 
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -173,7 +208,96 @@ public class Procesar extends javax.swing.JFrame {
             }
         });
     }
+    
+    public void Insertar(){     //Función que inserta procesos en la tabla jTable1.
+        DefaultTableModel data = (DefaultTableModel) jTable1.getModel();
+        contar++; //Aumenta el contador a medida que se agregan procesos.
+        Object[] tabla = new Object [5]; //El objeto tabla representa el numero de las columna.
+        tabla[0]= "Proceso "+contar;            //Llenamos la tabla.
+        tabla[1]= jTextField1.getText();        //Llenamos la tabla.
+        tabla[2]= jTextField1.getText();        //Llenamos la tabla.
+        tabla[3]= "-"; //jTextField1.getText(); //Llenamos la tabla.
+        tabla[4]= "Listo";                      //Llenamos la tabla.
+        data.addRow(tabla);     //Asignamos el objeto tabla a la fila de la tabla "data".
+        jTable1.setModel(data); //Asignamos la tabla "data" a la tabla jTable1.
+        jTextField1.setText(null);  //Se vacía el textfield para la nueva captura.
+        jTextField1.grabFocus();    //Enfoca en el campo para agregar con más rapidez.   
+    }
+    
+    private class HiloNuevo implements Runnable{     //Objeto Thread ejecutable
+        @Override
+        public void run(){  //Método de ejecución
+            boolean estado =true;   //Variable auxiliar par ala condición
+            int conta=0;        //Variable contador 
+            while(estado!=false){
+            while(conta<contar){ //Recorrer las filas
+                Carga(conta);
+                if(ResiduoRafaga!=0 && ResiduoRafaga>quantum){ 
+                    for(int ejecucion=1; ejecucion<=quantum; ejecucion++){
+                        jTable1.setValueAt("Ejecutando",conta,4);
+                        ResiduoRafaga--;
+                        Barra(Rafaga,ResiduoRafaga);
+                        Pintar();
+                        jTable1.setValueAt(String.valueOf(ResiduoRafaga),i,3);
+                        TiempoProceso++;
+                        Dormir();
+                    }
+                    jTable1.setValueAt("Bloqueado",conta,4);
+                    if(ResiduoRafaga==0){
+                        jTable1.setValueAt("Terminado",conta,4);
+                        Pintar();
+                        Informe(conta);
+                        Borrar(conta);
+                        jPBEstado.setValue(0);
+                    }
+            }else{
+                if(ResiduoRafaga>0 && quantum!=0){
+                    while(ResiduoRafaga>0){
+                        jTable1.setValueAt("Ejecutando",conta,4);
+                        ResiduoRafaga--;
+                        Barra(Rafaga,ResiduoRafaga);
+                        Pintar();
+                        jTable1.setValueAt(String.valueOf(ResiduoRafaga),i,3);
+                        TiempoProceso++;
+                        Dormir();
+                    }
+                    jTable1.setValueAt("Bloqueado",conta,4);
+                    if(ResiduoRafaga==0 && quantum!=0){
+                        jTIngreso.setValueAt("Terminado",conta,4);
+                        Pintar();
+                        Informe(conta);
+                        Borrar(conta);
+                        jPBEstado.setValue(0);
+                     }
+                    }else{
+                        if(ResiduoRafaga==0 && quantum!=0){
+                            jTIngreso.setValueAt("Terminado",conta,4);
+                            Pintar();
+                            Informe(conta);
+                            Borrar(conta);
+                            jPBEstado.setValue(0);
+                        }
+                    }
+                }
+                jLNumeroProceso.setText(String.valueOf("")); //Borrar contenido
+                jLPorcentajeProceso.setText(String.valueOf(""));
+                conta++;
+            }
+            conta=0;
+            jLNumeroProceso.setText(String.valueOf("")); //Borrar contenido
+            jLPorcentajeProceso.setText(String.valueOf(""));
+            
+        }
+        }
+        
+    }
 
+    public void Carga(int conta){ //Carga los valores de la Tabla a ejecución
+        NProceso=(int)jTable1.getValueAt(conta,0);
+        Rafaga=parseInt((String)(jTable1.getValueAt(conta,1)));
+        ResiduoRafaga=parseInt((String)(jTable1.getValueAt(conta,3)));
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
