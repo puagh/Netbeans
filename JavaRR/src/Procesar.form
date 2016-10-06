@@ -156,7 +156,7 @@
                 <Column editable="true" title="No. de Proceso" type="java.lang.Object"/>
                 <Column editable="true" title="R&#xe1;faga" type="java.lang.Object"/>
                 <Column editable="true" title="R&#xe1;faga restante" type="java.lang.Object"/>
-                <Column editable="true" title="Progreso" type="java.lang.Object"/>
+                <Column editable="true" title="Progreso %" type="java.lang.Object"/>
                 <Column editable="true" title="Estado" type="java.lang.Object"/>
               </Table>
             </Property>

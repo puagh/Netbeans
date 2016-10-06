@@ -82,7 +82,7 @@ public class Procesar extends javax.swing.JFrame {
 
             },
             new String [] {
-                "No. de Proceso", "Ráfaga", "Ráfaga restante", "Progreso", "Estado"
+                "No. de Proceso", "Ráfaga", "Ráfaga restante", "Progreso %", "Estado"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -208,33 +208,37 @@ public class Procesar extends javax.swing.JFrame {
             while(estado!=false){
                 while(conta<contar){ //Recorreriendo las filas
                     Carga(conta);
-                    if(rafagaRestante!=0 && rafagaRestante>quantum){ 
+                    if(rafagaRestante!=0 && rafagaRestante>quantum){
+                        tProceso = Rafaga-rafagaRestante;
                         for(int ejecucion=1; ejecucion<=quantum; ejecucion++){
                             jTable1.setValueAt("Ejecutando",conta,4);   //Actualización del estado del proceso a Ejecutando
                             rafagaRestante--;    //Reduciendo la ráfaga en 1
                             
                             jTable1.setValueAt(String.valueOf(rafagaRestante),conta,2);
                             Esperar();  //Función que ralentiza la ejecución para que espere 1 segundo
+                            
                             tProceso++;
-                            //ActualizarProceso(Rafaga,tProceso);
-                            //jTable1.setValueAt(String.valueOf(progreso),conta,3);
+                            ActualizarProceso(Rafaga,tProceso);
+                            jTable1.setValueAt(String.valueOf(progreso),conta,3);
                         }
                         jTable1.setValueAt("Bloqueado",conta,4);
                         if(rafagaRestante==0){
                             jTable1.setValueAt("Terminado",conta,4);
                             Limpiar(conta);
+                            ActualizarProceso(Rafaga,tProceso);
                         }
                     }
                     else{
                         if(rafagaRestante>0){
+                            tProceso = Rafaga-rafagaRestante;
                             while(rafagaRestante>0){     //Mientras exista un residuo de ráfaga CONDICIÓN
                                 jTable1.setValueAt("Ejecutando",conta,4);
                                 rafagaRestante--;
                                 jTable1.setValueAt(String.valueOf(rafagaRestante),conta,2);
                                 Esperar();  //Función que ralentiza la ejecución para que espere 1 segundo
                                 tProceso++;
-                                //ActualizarProceso(Rafaga,tProceso);
-                                //jTable1.setValueAt(String.valueOf(progreso),conta,3);
+                                ActualizarProceso(Rafaga,tProceso);
+                                jTable1.setValueAt(String.valueOf(progreso),conta,3);
                             }
                             jTable1.setValueAt("Bloqueado",conta,4);
                             if(rafagaRestante==0){
@@ -263,21 +267,18 @@ public class Procesar extends javax.swing.JFrame {
     }
     
     public void Limpiar(int c){ //Cambia el estado de los procesos cuando estos terminan de ejecutarse por completo.
-    jTable1.setValueAt("0",c,1);
     jTable1.setValueAt("0",c,2);
     jTable1.setValueAt("100%",c,3);
     jTable1.setValueAt("Terminado",c,4);
     }
     
-    //public void ActualizarProceso(int rafaga, int tProceso){ //Calcula porcentaje de la barra y su progreso
-    //    int Progreso;
-    //    Progreso = tProceso*100/rafaga;
-    //    progreso = Progreso;
-    //}
+    public void ActualizarProceso(int rafaga, int tProceso){ //Calcula progreso
+        progreso = tProceso*100/rafaga;
+    }
     
     public void Esperar(){
         try{
-            Thread.sleep(1000); //Permite esperar 1 segundo al sistema
+            Thread.sleep(800); //Permite esperar 1 segundo al sistema
         }
         catch(InterruptedException ex){
             Logger.getLogger(Procesar.class.getName()).log(Level.SEVERE,null,ex);
