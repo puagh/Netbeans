@@ -224,7 +224,7 @@ public class Procesar extends javax.swing.JFrame {
     
     public void Insertar(){     //Función que inserta procesos en la tabla jTable1.
         DefaultTableModel data = (DefaultTableModel) jTable1.getModel();
-        Object[] tabla = new Object [6]; //El objeto tabla representa el numero de las columna.
+        Object[] tabla = new Object[6]; //El objeto tabla representa el numero de las columna.
         tabla[0]= jTextField2.getText();        //Nombre del proceso. OK
         tabla[1]= jTextField1.getText();        //Ráfaga. OK
         tabla[2]= jTextField3.getText();        //Prioridad. OK
@@ -253,7 +253,7 @@ public class Procesar extends javax.swing.JFrame {
                     if(rafagaRestante!=0 && rafagaRestante>quantum){
                         tProceso = Rafaga-rafagaRestante;
                         for(int ejecucion=1; ejecucion<=quantum; ejecucion++){
-                            jTable1.setValueAt("Ejecutando",conta,4);   //Actualización del estado del proceso a Ejecutando
+                            jTable1.setValueAt("Ejecutando",conta,5);   //Actualización del estado del proceso a Ejecutando
                             rafagaRestante--;    //Reduciendo la ráfaga en 1
                             
                             jTable1.setValueAt(String.valueOf(rafagaRestante),conta,2);
@@ -263,9 +263,9 @@ public class Procesar extends javax.swing.JFrame {
                             ActualizarProceso(Rafaga,tProceso);
                             jTable1.setValueAt(String.valueOf(progreso),conta,3);
                         }
-                        jTable1.setValueAt("Bloqueado",conta,4);
+                        jTable1.setValueAt("Bloqueado",conta,5);
                         if(rafagaRestante==0){
-                            jTable1.setValueAt("Terminado",conta,4);
+                            jTable1.setValueAt("Terminado",conta,5);
                             Limpiar(conta);
                             ActualizarProceso(Rafaga,tProceso);
                         }
@@ -274,7 +274,7 @@ public class Procesar extends javax.swing.JFrame {
                         if(rafagaRestante>0){
                             tProceso = Rafaga-rafagaRestante;
                             while(rafagaRestante>0){     //Mientras exista un residuo de ráfaga CONDICIÓN
-                                jTable1.setValueAt("Ejecutando",conta,4);
+                                jTable1.setValueAt("Ejecutando",conta,5);
                                 rafagaRestante--;
                                 jTable1.setValueAt(String.valueOf(rafagaRestante),conta,2);
                                 Esperar();  //Función que ralentiza la ejecución para que espere 1 segundo
@@ -282,20 +282,20 @@ public class Procesar extends javax.swing.JFrame {
                                 ActualizarProceso(Rafaga,tProceso);
                                 jTable1.setValueAt(String.valueOf(progreso),conta,3);
                             }
-                            jTable1.setValueAt("Bloqueado",conta,4);
+                            jTable1.setValueAt("Bloqueado",conta,5);
                             if(rafagaRestante==0){
-                                jTable1.setValueAt("Terminado",conta,4);
+                                jTable1.setValueAt("Terminado",conta,5);
                                 Limpiar(conta);
                             }
                         }
                         else{
                             if(rafagaRestante==0){
-                                jTable1.setValueAt("Terminado",conta,4);
+                                jTable1.setValueAt("Terminado",conta,5);
                                 Limpiar(conta);
                             }
                         }
                     }
-                    conta--;
+                    conta++;
                 }
                 conta=0;  
             }
